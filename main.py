@@ -1,51 +1,51 @@
 import os
 import asyncio
 import json
+import logging
 from threading import Thread
 from flask import Flask
 from pyrogram import Client, filters, enums, idle
-from pyrogram.errors import UserNotParticipant, UserAlreadyParticipant
+from pyrogram.errors import UserNotParticipant, PeerIdInvalid, ChannelInvalid
+
+# --- LOGGING SETUP ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# --- FAKE WEBSITE FOR RENDER ---
+web_app = Flask(__name__)
+
+@web_app.route('/')
+def home():
+    return "⚡ ANYSNAP Bot is Running Successfully!"
+
+def run_web():
+    port = int(os.environ.get("PORT", 8080))
+    web_app.run(host="0.0.0.0", port=port)
+
+def keep_alive():
+    t = Thread(target=run_web)
+    t.daemon = True
+    t.start()
 
 # --- CONFIGURATION ---
 API_ID = 37314366
 API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 
-# ✅ SESSION STRING
-SESSION_STRING = "AQI5Xz4AxQryFBEInZokcDHtOY-r3t62LsBtM8rBOMNWUfHMQtG1CpbugFzxwpoW17c0uiaESKbdVjzuFypvE4mwomY4IaXCJ3KQ2OBpJNHbDMp6yNFFzTBDsbsGfpqL-lYB4iKZKfHksMbYlZxDMru02Wx4J4bahj4gWcZZfhg0FeE1p2hNnbMUf0QMzivSpGaPFfbOLDToRTELqaYH_16VjbTUlUbj3_7HFvJgb48zoHA8ENXCn4Hlv4RK4W6NPO2JrcQYlJe1aWJ4bqI182zGv7JS1FykApHe8Tm1kY36zVIwZtp2nfQyUrvkM3OIyfuIX3dhDfTrFXHZ2hGHYvl7Tl48agAAAAHyhnG8AA"
+# SESSION STRING
+SESSION_STRING = "BQI5Xz4AAE-wZBtmBXs97nMdyF1yqluYElPTcxOHvN3hokFJOCuXtXEcut0VZrjqcae6lVE4scAWKHzYRX8XrXsFkJfFnsYbY3DgpYSHsoMjOPdI4kxfS7b5KxU4Fq0GxVRqcJNXABv609P1tJapDVXI86dc9InPzLKJvFvrH_gP00MRgf76DrAiU-G3fyhJAptY1jtyYT3BkWn-n9Hqlce9ULfAgphtloeJMIbpWdMo5u8A5WLFX6FwMbfUKkHGvetx9EuWKEciCjmHHV_glhUp_fZ7XKI2UKVhJnuASNgNZjTxgfw3da6Ekia8Yfk7JRPAEzezIu_tgrxS1gZ6aDom3RWZQQAAAAFJSgVkAA"
 
-# 🎯 DATA SOURCE
-TARGET_USERNAME = "Anysnapworld"  
-
-# 👑 BRANDING
-NEW_FOOTER = "⚡ Designed & Powered by @XLDAREDEVIL"
+TARGET_BOT = "Random_insight69_bot"
+NEW_FOOTER = "⚡ Designed & Powered by @MAGMAxRICH"
 
 # --- 🔐 SECURITY SETTINGS ---
-ALLOWED_GROUPS = [-1003387459132]
+ALLOWED_GROUPS = [-1003387459132] 
 
-# ✅ CHANNELS
 FSUB_CONFIG = [
-    {"username": "Daredevilxlhub", "link": "https://t.me/Daredevilxlhub"},
-    {"username": "daredevil_tm_group", "link": "https://t.me/daredevil_tm_group"}
+    {"username": "Anysnapupdate", "link": "https://t.me/Anysnapupdate"},
+    {"username": "Anysnapsupport", "link": "https://t.me/Anysnapsupport"}
 ]
 
-# --- 🌐 FLASK KEEP ALIVE (FOR RENDER) ---
-flask_app = Flask(__name__)
-
-@flask_app.route('/')
-def home():
-    return "🔥 Dark Devil Bot is Running on Render!"
-
-def run_web():
-    # Render assigns a port automatically via os.environ
-    port = int(os.environ.get("PORT", 8080))
-    flask_app.run(host="0.0.0.0", port=port)
-
-def keep_alive():
-    t = Thread(target=run_web)
-    t.start()
-
-# --- PYROGRAM CLIENT ---
-app = Client("dark_devil_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+app = Client("anysnap_secure_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 # --- HELPER: CHECK IF USER JOINED ---
 async def check_user_joined(client, user_id):
@@ -59,88 +59,102 @@ async def check_user_joined(client, user_id):
         except UserNotParticipant:
             missing = True
             break
-        except Exception:
+        except (PeerIdInvalid, ChannelInvalid, KeyError):
             pass
+        except Exception:
+            pass 
     return not missing 
 
 # --- DASHBOARD ---
 @app.on_message(filters.command(["start", "help", "menu"], prefixes="/") & (filters.private | filters.chat(ALLOWED_GROUPS)))
 async def show_dashboard(client, message):
-    if not await check_user_joined(client, message.from_user.id):
-        return await message.reply_text(
-            "🚫 **Access Denied!**\n\n"
-            "Bot use karne ke liye pehle niche diye gaye channels join karein:\n\n"
-            "📢 **[Click to Join Channel](https://t.me/Daredevilxlhub)**\n"
-            "👥 **[Click to Join Group](https://t.me/daredevil_tm_group)**\n\n"
-            "__Join karne ke baad dubara /start dabayein.__",
-            disable_web_page_preview=True
-        )
+    try:
+        if not await check_user_joined(client, message.from_user.id):
+            return await message.reply_text(
+                "🚫 **Access Denied!**\n\n"
+                "Bot use karne ke liye pehle niche diye gaye channels join karein:\n\n"
+                "📢 **[Click to Join Updates](https://t.me/Anysnapupdate)**\n"
+                "👥 **[Click to Join Support](https://t.me/Anysnapsupport)**\n\n"
+                "__Join karne ke baad dubara /start dabayein.__",
+                disable_web_page_preview=True
+            )
 
-    text = (
-        "📖 **DARK DEVIL DASHBOARD**\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "📢 **Channel:** [Join Here](https://t.me/Daredevilxlhub)\n"
-        "👥 **Group:** [Join Here](https://t.me/daredevil_tm_group)\n"
-        "━━━━━━━━━━━━━━━━━━\n\n"
-        "ᴍᴏʙɪʟᴇ: `/num 98XXXXXX10`\n"
-        "ᴀᴀᴅʜᴀᴀʀ: `/aadhaar 1234XXXX9012`\n"
-        "ɢsᴛ: `/gst 24ABCDE1234F1Z5`\n"
-        "ɪғsᴄ: `/ifsc SBIN0000000`\n"
-        "ᴜᴘɪ: `/upi username@bank`\n"
-        "ғᴀᴍ: `/fam username@fam`\n"
-        "ᴠᴇʜɪᴄʟᴇ: `/vehicle GJ01AB1234`\n"
-        "ᴛᴇʟᴇɢʀᴀᴍ: `/tg @username`\n"
-        "ᴛʀᴀᴄᴇ: `/trace 98XXXXXXXX`\n"
-        "ɢᴍᴀɪʟ: `/gmail example@gmail.com`\n\n"
-        "⚠️ **Note:** Result 30 seconds mein auto-delete ho jayega.\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        f"{NEW_FOOTER}"
-    )
-    await message.reply_text(text, disable_web_page_preview=True)
+        text = (
+            "📖 **ANYSNAP BOT DASHBOARD**\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            "📢 **Updates:** [Join Here](https://t.me/Anysnapupdate)\n"
+            "👥 **Support:** [Join Here](https://t.me/Anysnapsupport)\n"
+            "━━━━━━━━━━━━━━━━━━\n\n"
+            "🔍 **Lookup Services:**\n"
+            "📱 `/num [number]`\n🚗 `/vehicle [plate]`\n🆔 `/aadhar [uid]`\n"
+            "👨‍👩‍👧‍👦 `/familyinfo [uid]`\n🔗 `/vnum [plate]`\n💸 `/fam [id]`\n📨 `/sms [number]`\n\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            "⚡ **Designed & Powered by @MAGMAxRICH**"
+        )
+        await message.reply_text(text, disable_web_page_preview=True)
+    except Exception as e:
+        logger.error(f"Error in dashboard: {e}")
 
 # --- MAIN LOGIC ---
-@app.on_message(filters.command(["num", "aadhaar", "gst", "ifsc", "upi", "fam", "vehicle", "tg", "trace", "gmail"], prefixes="/") & (filters.private | filters.chat(ALLOWED_GROUPS)))
+@app.on_message(filters.command(["num", "vehicle", "aadhar", "familyinfo", "vnum", "fam", "sms"], prefixes="/") & (filters.private | filters.chat(ALLOWED_GROUPS)))
 async def process_request(client, message):
     
-    if not await check_user_joined(client, message.from_user.id):
-        return await message.reply_text(
-            "🚫 **Access Denied!**\n\n"
-            "Result dekhne ke liye pehle join karein:\n\n"
-            "➡️ **[Join Channel](https://t.me/Daredevilxlhub)**\n"
-            "➡️ **[Join Group](https://t.me/daredevil_tm_group)**\n\n"
-            f"__Join karne ke baad wapas `/{message.command[0]}` bhejein.__",
-            disable_web_page_preview=True
-        )
-
-    if len(message.command) < 2:
-        return await message.reply_text(f"❌ **Data Missing!**\nUsage: `/{message.command[0]} <value>`")
-
-    status_msg = await message.reply_text(f"🔍 **Searching via Dark Devil...**")
-
     try:
-        sent_req = await client.send_message(TARGET_USERNAME, message.text)
-        target_response = None
+        if not await check_user_joined(client, message.from_user.id):
+            return await message.reply_text(
+                "🚫 **Access Denied!**\n\n"
+                "Result dekhne ke liye pehle join karein:\n\n"
+                "➡️ **[Join Update Channel](https://t.me/Anysnapupdate)**\n"
+                "➡️ **[Join Support Group](https://t.me/Anysnapsupport)**\n\n"
+                f"__Join karne ke baad wapas `/{message.command[0]}` bhejein.__",
+                disable_web_page_preview=True
+            )
 
-        for attempt in range(20):
-            await asyncio.sleep(2.5)
-            async for log in client.get_chat_history(TARGET_USERNAME, limit=5):
-                if log.reply_to_message_id == sent_req.id:
-                    text_content = (log.text or log.caption or "").lower()
-                    ignore_words = ["wait", "processing", "searching", "scanning", "generating", "loading", "checking"]
-                    if any(word in text_content for word in ignore_words):
-                        await status_msg.edit(f"⏳ **Dark Devil Processing... (Attempt {attempt+1})**")
-                        break 
-                    target_response = log
-                    break 
-            if target_response: break
+        if len(message.command) < 2:
+            return await message.reply_text(f"❌ **Data Missing!**\nUsage: `/{message.command[0]} <value>`")
 
-        if not target_response:
-            await status_msg.edit(f"❌ **Timeout:** Server se reply nahi aaya.")
+        status_msg = await message.reply_text(f"🔍 **Searching via ANYSNAP...**")
+        
+        try:
+            sent_req = await client.send_message(TARGET_BOT, message.text)
+        except PeerIdInvalid:
+             await status_msg.edit("❌ **Error:** Target Bot ID invalid. Userbot must start @Random_insight69_bot first.")
+             return
+        except Exception as e:
+            await status_msg.edit(f"❌ **Request Error:** {e}")
             return
 
+        target_response = None
+        
+        # --- WAIT LOOP ---
+        for attempt in range(15):
+            await asyncio.sleep(2.5) 
+            try:
+                async for log in client.get_chat_history(TARGET_BOT, limit=1):
+                    if log.id == sent_req.id: continue
+                    
+                    text_content = (log.text or log.caption or "").lower()
+                    ignore_words = ["wait", "processing", "searching", "scanning", "generating", "loading", "checking"]
+                    
+                    if any(word in text_content for word in ignore_words):
+                        if f"Attempt {attempt+1}" not in status_msg.text:
+                            await status_msg.edit(f"⏳ **Fetching Data... (Attempt {attempt+1})**")
+                        continue 
+                    
+                    target_response = log
+                    break 
+            except Exception as e:
+                logger.error(f"Error fetching history: {e}")
+            if target_response: break
+        
+        if not target_response:
+            await status_msg.edit("❌ **Timeout:** Target bot ne final result nahi diya.")
+            return
+
+        # --- Data Handling ---
         raw_text = ""
         if target_response.document:
-            await status_msg.edit("📂 **Downloading & Parsing File...**")
+            await status_msg.edit("📂 **Downloading File...**")
             file_path = await client.download_media(target_response)
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 raw_text = f.read()
@@ -154,63 +168,93 @@ async def process_request(client, message):
             await status_msg.edit("❌ **No Data Found**")
             return
 
-        json_data = {
-            "status": "success",
-            "service": "Dark Devil Lookup",
-            "source": f"@{TARGET_USERNAME}",
-            "query_type": message.command[0],
-            "input": message.command[1],
-            "raw_result": raw_text.strip(),
-            "credits": NEW_FOOTER
-        }
+        # --- ADVANCED JSON PARSING (Fix for Multiple Results) ---
+        lines = raw_text.splitlines()
+        
+        all_records = []      # List to hold all results
+        current_record = {}   # Dictionary for the current result being processed
+        
+        for line in lines:
+            clean_line = line.strip()
+            
+            # Skip junk lines
+            if not clean_line or any(x in clean_line for x in ["@DuXxZx_info", "Designed & Powered", "Scanning Vehicle"]):
+                continue
 
-        final_json_str = json.dumps(json_data, indent=4, ensure_ascii=False)
-        formatted_output = f"```json\n{final_json_str}\n```"
+            # Check if this line is a Key: Value pair
+            if ":" in clean_line:
+                try:
+                    parts = clean_line.split(":", 1)
+                    key = parts[0].strip().replace("*", "").replace("`", "")
+                    value = parts[1].strip().replace("*", "").replace("`", "")
+                    
+                    # LOGIC CHANGE: 
+                    # Agar key pehle se current_record me hai (jaise Name dobara aaya),
+                    # iska matlab naya record shuru ho gaya hai.
+                    if key in current_record:
+                        all_records.append(current_record) # Save old record
+                        current_record = {} # Start new record
+                    
+                    current_record[key] = value
+                except:
+                    # Formatting error, maybe ignore or add to separate list
+                    pass
+            elif "Record" in clean_line or "---" in clean_line:
+                 # Explicit separator detection (Backup logic)
+                 if current_record:
+                     all_records.append(current_record)
+                     current_record = {}
 
-        sent_results = []
-        if len(formatted_output) > 4000:
-            msg1 = await message.reply_text(formatted_output[:4000])
-            msg2 = await message.reply_text(formatted_output[4000:])
-            sent_results.extend([msg1, msg2])
+        # Add the last remaining record
+        if current_record:
+            all_records.append(current_record)
+
+        # Result Generation
+        if not all_records:
+            # Fallback agar parsing fail hui to raw text dikha dega JSON me
+            json_output = json.dumps({"Raw Data": lines}, indent=4, ensure_ascii=False)
         else:
-            msg = await message.reply_text(formatted_output)
-            sent_results.append(msg)
+            # Agar sirf ek result hai to list nahi, direct dict dikhaye (User preference)
+            # Ya user chahta hai hamesha list rahe? Safer is List.
+            json_output = json.dumps(all_records, indent=4, ensure_ascii=False)
+
+        # Formatting: JSON Code Block + Normal Text Footer
+        final_message_text = f"```json\n{json_output}\n```\n\n{NEW_FOOTER}"
 
         await status_msg.delete()
-        await asyncio.sleep(30)
-        for msg in sent_results:
-            try: await msg.delete()
-            except: pass
 
-    except Exception as e:
-        await status_msg.edit(f"❌ **Error:** {str(e)}")
-
-# --- STARTUP LOGIC ---
-async def start_bot():
-    print("🚀 Starting Dark Devil Bot...")
-    await app.start()
-    
-    print(f"🔄 Connecting to Data Source: @{TARGET_USERNAME}...")
-    try:
-        chat = await app.get_chat(TARGET_USERNAME)
-        print(f"✅ Connected to: {chat.title} (ID: {chat.id})")
-        if chat.type in [enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL, enums.ChatType.GROUP]:
+        # --- SENDING RESULT ---
+        sent_result_msg = None
+        if len(final_message_text) > 4000:
+            sent_result_msg = await message.reply_text(final_message_text[:4000])
+            await message.reply_text(final_message_text[4000:])
+        else:
+            sent_result_msg = await message.reply_text(final_message_text)
+            
+        # --- AUTO DELETE (30s) ---
+        if sent_result_msg:
+            await asyncio.sleep(30)
             try:
-                await app.join_chat(TARGET_USERNAME)
-                print("✅ Joined Data Source Successfully!")
-            except UserAlreadyParticipant:
-                print("✅ Already Connected.")
+                await sent_result_msg.delete()
             except Exception:
                 pass
-    except Exception as e:
-        print(f"❌ CRITICAL: Could not connect to @{TARGET_USERNAME} - {e}")
 
-    print(f"🔥 Dark Devil is Live! Powered by @XLDAREDEVIL")
+    except Exception as e:
+        try:
+            await status_msg.edit(f"❌ **Error:** {str(e)}")
+        except:
+            pass
+
+# --- START SERVER & BOT ---
+async def start_bot():
+    print("🚀 Starting Web Server...")
+    keep_alive() 
+    print("🚀 Starting Pyrogram Client...")
+    await app.start()
+    print("✅ Bot is Online!")
     await idle()
     await app.stop()
 
 if __name__ == "__main__":
-    # Start Flask Server
-    keep_alive()
-    # Start Bot
-    app.run(start_bot())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_bot())
