@@ -41,8 +41,8 @@ NEW_FOOTER = "⚡ Designed & Powered by @MAGMAxRICH"
 ALLOWED_GROUPS = [-1003387459132] 
 
 FSUB_CONFIG = [
-    {"username": "Anysnapupdate", "link": "https://t.me/Anysnapupdate"},
-    {"username": "Anysnapsupport", "link": "https://t.me/Anysnapsupport"}
+    {"_____"},
+    {"_____"}
 ]
 
 app = Client("anysnap_secure_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
